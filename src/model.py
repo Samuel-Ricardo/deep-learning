@@ -119,30 +119,63 @@ from download import download
 
 url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/" \
 "notebook/datasets/MNIST_Data.zip"
-
-path = download(url, "./assets/", kind="zip", replace=True)
+# note: download will be triggered only if dataset is missing
 #%%
 
 #%%
-import ops
+import os
+import zipfile
+import glob
 import mindspore.dataset as ds 
 import matplotlib.pyplot as plt 
 #%%
 
 #%%
-dataset_dir = "./MNIST/train"
-mnist_dataset = ds.MnistDataset(dataset_dir=dataset_dir, num_sample=3)
+#%%
+# Try common dataset locations and download/extract if missing
+preferred_roots = ["./MNIST/train", "./MNIST_Data/train"]
+dataset_dir = None
+for p in preferred_roots:
+    if os.path.isdir(p):
+        dataset_dir = p
+        break
 
-plt.figure(figsize=(8,8))
-i = 1 
-#%%
-for dic in mnist_dataset.create_dict_iterator(output_numpy=True):
-    plt.subplot(3,3,i)
-    plt.imshow(dict['image'][:,:, 0])
-    plt.axis('off')
-    i += 1 
-#%%
-plt.show()
+if dataset_dir is None:
+    print(f"Dataset directory not found. Attempting to download and extract...")
+    try:
+        path = download(url, "./", kind="zip", replace=True)
+    except Exception as e:
+        print(f"Download failed: {e}")
+        path = None
+
+    # prefer extracted folders if present
+    for p in preferred_roots:
+        if os.path.isdir(p):
+            dataset_dir = p
+            break
+
+    # fallback: look for any directory containing 'mnist' with a train subdir
+    if dataset_dir is None:
+        for d in os.listdir('.'):
+            if os.path.isdir(d) and 'mnist' in d.lower():
+                candidate = os.path.join(d, 'train')
+                if os.path.isdir(candidate):
+                    dataset_dir = candidate
+                    break
+
+if dataset_dir:
+    mnist_dataset = ds.MnistDataset(dataset_dir=dataset_dir, num_samples=3)
+
+    plt.figure(figsize=(8,8))
+    i = 1
+    for dic in mnist_dataset.create_dict_iterator(output_numpy=True):
+        plt.subplot(3,3,i)
+        plt.imshow(dic['image'][:, :, 0], cmap='gray')
+        plt.axis('off')
+        i += 1
+    plt.show()
+else:
+    print("Dataset directory still not found after download/extract. Check the download output and ensure MNIST train/test folders exist.")
 #%%
 
 
