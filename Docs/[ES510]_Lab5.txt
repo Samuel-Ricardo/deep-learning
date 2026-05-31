@@ -1,0 +1,1727 @@
+Universidade Federal de Pernambuco (UFPE)
+Laboratório 5: Estrutura de desenvolvimento de IA e Deep
+Learning
+1 Introdução
+1.1 Sobre Este Laboratório
+Neste laboratório, serão apresentados os conceitos fundamentais da estrutura de desen-
+volvimento de Inteligência ArtificialMindSpore, com foco em aplicações práticas de Deep
+Learning. O objetivo é fornecer uma introdução ao ambiente MindSpore, explorando sua
+sintaxe básica, principais módulos e fluxo de desenvolvimento de modelos de aprendizado
+profundo.
+Inicialmente, serão abordados conceitos introdutórios relacionados ao framework
+MindSpore, permitindo compreender sua estrutura e principais funcionalidades. Em
+seguida, serão desenvolvidos experimentos envolvendo reconhecimento de caracteres
+escritos à mão, utilizando redes neurais aplicadas ao dataset MNIST.
+Posteriormente, serão exploradas aplicações de classificação de imagens utilizando ar-
+quiteturas modernas de redes neurais convolucionais, como MobileNetV2 e ResNet-50,
+aplicadas ao problema de classificação de flores. Esses experimentos permitirão compre-
+ender diferentes estratégias de construção, treinamento e avaliação de modelos de Deep
+Learning para visão computacional.
+Ao longo do laboratório, também serão investigadas etapas importantes do pipeline
+de aprendizado de máquina, incluindo preparação dos dados, treinamento, inferência e
+avaliação de desempenho dos modelos.
+1.2 Objetivos
+•Compreender os conceitos básicos da estrutura MindSpore.
+•Familiarizar-se com a sintaxe e os módulos principais do MindSpore.
+•Implementar modelos simples de reconhecimento de caracteres escritos à mão.
+•Compreender o fluxo de treinamento e inferência de modelos de Deep Learning.
+•Aplicar redes neurais convolucionais em problemas de classificação de imagens.
+•Explorar arquiteturas MobileNetV2 e ResNet-50.
+•Desenvolver modelos de classificação de imagens utilizando datasets reais.
+•Compreender etapas de preparação de dados, treinamento e avaliação de modelos.
+1.3 Configuração do Ambiente
+1.3.1 Instalação do MindSpore
+OMindSporeé uma estrutura computacional de Inteligência Artificial desenvolvida pela
+Huawei, projetada para operar de forma integrada em cenários de dispositivo, borda e nu-
+ES510-Introdução à IA– Prof. David Guerra – 2026 1
+
+Universidade Federal de Pernambuco (UFPE)
+vem. Ele fornece APIs unificadas e recursos completos para desenvolvimento, treinamento
+e implantação de modelos de IA.
+Essa plataforma utiliza uma arquitetura distribuída que permite colaboração sob de-
+manda entre diferentes camadas computacionais, além de oferecer eficiência no uso de
+recursos, segurança e confiabilidade no desenvolvimento de aplicações de IA.
+1.3.2 Instalação do MindSpore 1.7
+Etapa 1– Criar um ambiente virtual.
+Ambientes virtuais permitem isolar dependências de diferentes projetos, evitando con-
+flitos entre bibliotecas.
+Observação:A versãopython=3.7é necessária para compatibilidade com o MindSpore
+1.7.
+Etapa 2– Ativar o ambiente virtual.
+Observação:Após a ativação, o nome do ambiente virtual aparecerá no início do prompt
+do terminal.
+Etapa 3– Instalar o MindSpore.
+Código:
+pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.7.1/MindSpore
+/cpu/x86_64/mindspore-1.7.1-cp37-cp37m-win_amd64.whl --trusted-host ms-release.
+obs.cn-north-4.myhuaweicloud.com
+Observação:
+Se a mensagem contendoSuccessfullyaparecer ao final da instalação, significa que
+o processo foi concluído com sucesso.
+Etapa 4– Verificar a instalação.
+Código:
+python -c "import mindspore; mindspore.run_check()"
+Saída esperada:
+MindSpore version: <version_number>
+The result of multiplication calculation is correct, MindSpore has been
+installed successfully!
+Observação:
+Seamensagemacimaforexibida, oMindSporefoiinstaladocorretamenteeoambiente
+está pronto para uso.
+2 Noções básicas do MindSpore
+2.1 Sobre Este Laboratório
+Este exercício introduz a estrutura de dados tensoriais do MindSpore. Executando uma
+série de operações em tensores, você poderá entender a sintaxe básica do MindSpore.
+ES510-Introdução à IA– Prof. David Guerra – 2026 2
+
+Universidade Federal de Pernambuco (UFPE)
+2.1.1 Objetivos
+•Dominar o método de criação de tensores.
+•Dominar os atributos e métodos dos tensores.
+2.1.2 Ambiente de laboratório
+Recomenda-se o MindSpore 1.7 ou superior. O exercício pode ser realizado em um PC.
+2.2 Procedimento
+2.2.1 Introdução aos tensores
+Tensor é uma estrutura básica de dados em computação de rede doMindSpore. Para
+detalhes sobre tipos de dados em tensores, consulte a descrição do dtype no site oficial do
+MindSpore.
+Tensores de diferentes dimensões representam dados diferentes. Por exemplo, um ten-
+sor 0-dimensional representa um escalar, um tensor 1-dimensional representa um vetor,
+um tensor 2-dimensional representa uma matriz e um tensor 3-dimensional pode repre-
+sentar os três canais de imagens RGB.
+Os tensores doMindSporesão compatíveis com diferentes tipos de dados, incluindo
+int8,int16,int32,int64,uint8,uint16,uint32,uint64,float16,float32,float64
+ebool_, que correspondem aos tipos de dados deNumPy.
+NoprocessocomputacionaldoMindSpore, otipodedadosintemPythonéconvertido
+para o tipoint64definido e o tipo de dadosfloaté convertido para o tipofloat32
+definido.
+2.2.2 Criação de tensores
+Durante a criação do tensor os tipos a seguir podem ser inseridos:float,int,Boolean,
+tuple,list, eNumPy.array.Tuplee alistpodem armazenar apenas dados dos tipos
+float,inteBoolean. O tipo de dados pode ser especificado durante a inicialização do
+tensor. Se o tipo de dados não for especificado, os valores iniciais int, float e bool gerarão
+tensores 0-dimensionais com os tipos de dadosmindspore.int32,mindspore.float32
+emindspore.bool_, respectivamente. Os tipos de dados dos tensores 1-dimensionais
+gerados pelos valores iniciaistupleelistcorrespondem aos tipos de dados de tensores
+armazenados na tupla e lista. Se vários tipos de dados estiverem contidos, o tipo de
+dados doMindSporecorrespondente ao tipo de dados com a prioridade mais alta será
+selecionado (Boolean<int<float). Se o valor inicial éTensor, o tipo de dados é
+tensor. Se o valor inicial éNumPy.array, o tipo de dados do tensor gerado corresponde
+aNumPy.array.
+Etapa 1– Criar um tensor utilizando um array.
+Código:
+# Importa o MindSpore.
+import mindspore
+ES510-Introdução à IA– Prof. David Guerra – 2026 3
+
+Universidade Federal de Pernambuco (UFPE)
+# A celula cria várias linhas ao mesmo tempo.
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = "all"
+import numpy as np
+from mindspore import Tensor
+from mindspore import dtype
+# Use um array para criar um tensor.
+x = Tensor(np.array([[1, 2], [3, 4]]), dtype.int32)
+x
+Resultado:
+Tensor(shape=[2, 2], dtype=Int32, value=
+[[1, 2],
+[3, 4]])
+Etapa 2– Criar tensores utilizando valores numéricos.
+Código:
+# Use um numeral para criar tensores.
+y = Tensor(1.0, dtype.int32)
+z = Tensor(2, dtype.int32)
+y
+z
+Resultado:
+Tensor(shape=[], dtype=Int32, value= 1)
+Tensor(shape=[], dtype=Int32, value= 2)
+Etapa 3– Criar um tensor utilizando valores booleanos.
+Código:
+# Use booleano para criar um tensor.
+m = Tensor(True, dtype.bool_)
+m
+Resultado:
+Tensor(shape=[], dtype=Bool, value= True)
+Etapa 4– Criar um tensor utilizando uma tupla.
+Código:
+# Use uma tupla para criar um tensor.
+n = Tensor((1, 2, 3), dtype.int16)
+n
+Resultado:
+ES510-Introdução à IA– Prof. David Guerra – 2026 4
+
+Universidade Federal de Pernambuco (UFPE)
+Tensor(shape=[3], dtype=Int16, value= [1, 2, 3])
+Etapa 5– Criar um tensor utilizando uma lista.
+Código:
+# Use uma lista para criar um tensor.
+p = Tensor([4.0, 5.0, 6.0], dtype.float64)
+p
+Resultado:
+Tensor(shape=[3], dtype=Float64, value=
+[4.00000000e+000, 5.00000000e+000, 6.00000000e+000]
+Etapa 6– Receber atributos de outro tensor para criar um novo tensor.
+Código:
+from mindspore import ops
+oneslike = ops.OnesLike()
+x = Tensor(np.array([[0, 1], [2, 1]]).astype(np.int32))
+output = oneslike(x)
+output
+Resultado:
+Tensor(shape=[2, 2], dtype=Int32, value=
+[[1, 1],
+[1, 1]])
+Etapa 7– Obter valores constantes de um tensor.
+Código:
+from mindspore.ops import operations as ops
+shape = (2, 2)
+ones = ops.Ones()
+output = ones(shape, dtype.float32)
+print(output)
+zeros = ops.Zeros()
+output = zeros(shape, dtype.float32)
+print(output)
+Resultado:
+[[1. 1.]
+[1. 1.]]
+ES510-Introdução à IA– Prof. David Guerra – 2026 5
+
+Universidade Federal de Pernambuco (UFPE)
+[[0. 0.]
+[0. 0.]]
+2.2.3 Atributos dos Tensores
+Os atributos do tensor incluem a forma (shape) e o tipo de dados (dtype).
+•Forma: tupla
+•Tipo de dados: tipo de dados do MindSpore
+Código:
+x = Tensor(np.array([[1, 2], [3, 4]]), dtype.int32)
+x.shape# Forma
+x.dtype# Tipo dos dados
+x.ndim# Dimensão
+x.size# Tamanho
+Resultado:
+(2, 2)
+mindspore.int32
+2
+4
+2.2.4 Métodos dos Tensores
+asnumpy(): converte um tensor para um array NumPy.
+Código:
+y = Tensor(np.array([[True, True], [False, False]]), dtype.bool_)
+# Converte o tensor para NumPy.
+y_array = y.asnumpy()
+y
+y_array
+Resultado:
+Tensor(shape=[2, 2], dtype=Bool, value=
+[[ True, True],
+[False, False]])
+array([[ True, True],
+[False, False]])
+ES510-Introdução à IA– Prof. David Guerra – 2026 6
+
+Universidade Federal de Pernambuco (UFPE)
+2.2.5 Operações com Tensores
+Existem diversas operações entre tensores, incluindo operações aritméticas, álgebra linear,
+processamento de matrizes e amostragem.
+Etapa 1– Executar indexação e fatiamento.
+Código:
+tensor = Tensor(np.array([[0, 1], [2, 3]]).astype(np.float32))
+print("First row: {}".format(tensor[0]))
+print("First column: {}".format(tensor[:, 0]))
+print("Last column: {}".format(tensor[..., -1]))
+Resultado:
+First row: [0. 1.]
+First column: [0. 2.]
+Last column: [1. 3.]
+Etapa 2– Concatenar tensores.
+Código:
+data1 = Tensor(np.array([[0, 1], [2, 3]]).astype(np.float32))
+data2 = Tensor(np.array([[4, 5], [6, 7]]).astype(np.float32))
+op = ops.Stack()
+output = op([data1, data2])
+print(output)
+Resultado:
+[[[0. 1.]
+[2. 3.]]
+[[4. 5.]
+[6. 7.]]]
+Etapa 3– Converter tensor para NumPy.
+Código:
+zeros = ops.Zeros()
+output = zeros((2,2), dtype.float32)
+print("output: {}".format(type(output)))
+n_output = output.asnumpy()
+print("n_output: {}".format(type(n_output)))
+ES510-Introdução à IA– Prof. David Guerra – 2026 7
+
+Universidade Federal de Pernambuco (UFPE)
+Resultado:
+output: <class ’mindspore.common.tensor.Tensor’>
+n_output: <class ’numpy.ndarray’>
+2.3 Carregamento de Conjuntos de Dados
+O MindSpore fornece APIs para carregar e processar conjuntos de dados como MNIST,
+CIFAR-10, CIFAR-100, VOC, ImageNet e CelebA.
+2.3.1 Carregar o Dataset MNIST
+Etapa 1– Carregar o conjunto de dados MNIST.
+Baixar o dataset MNIST.
+Código:
+from download import download
+url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/" \
+"notebook/datasets/MNIST_Data.zip"
+path = download(url, "./", kind="zip", replace=True)
+Código:
+import os
+import mindspore.dataset as ds
+import matplotlib.pyplot as plt
+dataset_dir = "./MNIST/train"# Caminho do conjunto de dados
+# Lê três imagens do conjunto de dados MNIST.
+mnist_dataset = ds.MnistDataset(dataset_dir=dataset_dir, num_samples=3)
+# Visualiza as imagens e define seus tamanhos.
+plt.figure(figsize=(8,8))
+i = 1
+# Exibe os três subgráficos.
+for dic in mnist_dataset.create_dict_iterator(output_numpy=True):
+plt.subplot(3,3,i)
+plt.imshow(dic[’image’][:,:,0])
+plt.axis(’off’)
+i +=1
+plt.show()
+Resultado:
+ES510-Introdução à IA– Prof. David Guerra – 2026 8
+
+Universidade Federal de Pernambuco (UFPE)
+Figura 1:Exemplo do conjunto de dados MNIST
+2.3.2 Personalizar um Conjunto de Dados
+Para conjuntos de dados que não podem ser carregados diretamente pelo MindSpore, é
+possível criar uma classe personalizada e utilizar a APIGeneratorDataset.
+Código:
+import numpy as np
+np.random.seed(58)
+class DatasetGenerator:
+# Inicialização do dataset.
+def __init__(self):
+self.data = np.random.sample((5, 2))
+self.label = np.random.sample((5, 1))
+# Retorna amostras individuais.
+def __getitem__(self, index):
+return self.data[index], self.label[index]
+# Retorna o número de amostras.
+def __len__(self):
+return len(self.data)
+# Criação do dataset personalizado.
+dataset_generator = DatasetGenerator()
+dataset = ds.GeneratorDataset(
+dataset_generator,
+["data", "label"],
+shuffle=False
+)
+# Obté m os dados.
+for data in dataset.create_dict_iterator():
+print(’{}’.format(data["data"]),
+ES510-Introdução à IA– Prof. David Guerra – 2026 9
+
+Universidade Federal de Pernambuco (UFPE)
+’{}’.format(data["label"]))
+Resultado:
+[0.36510558 0.45120592] [0.78888122]
+[0.49606035 0.07562207] [0.38068183]
+[0.57176158 0.28963401] [0.16271622]
+[0.30880446 0.37487617] [0.54738768]
+[0.81585667 0.96883469] [0.77994068]
+2.3.3 Ampliação de Dados
+As APIs de dataset do MindSpore oferecem suporte a operações como embaralhamento e
+processamento em lote.
+Etapa 1– Embaralhar e dividir os dados em lotes.
+Código:
+ds.config.set_seed(58)
+# Embaralha os dados.
+dataset = dataset.shuffle(buffer_size=10)
+# Divide os dados em lotes.
+dataset = dataset.batch(batch_size=2)
+for data in dataset.create_dict_iterator():
+print("data: {}".format(data["data"]))
+print("label: {}".format(data["label"]))
+Resultado:
+data: [[0.36510558 0.45120592]
+[0.57176158 0.28963401]]
+label: [[0.78888122]
+[0.16271622]]
+data: [[0.30880446 0.37487617]
+[0.49606035 0.07562207]]
+label: [[0.54738768]
+[0.38068183]]
+data: [[0.81585667 0.96883469]]
+label: [[0.77994068]]
+Etapa 2– Visualizar amostras do dataset.
+ES510-Introdução à IA– Prof. David Guerra – 2026 10
+
+Universidade Federal de Pernambuco (UFPE)
+Código:
+import matplotlib.pyplot as plt
+from mindspore.dataset.vision import Inter
+import mindspore.dataset.vision.c_transforms as c_vision
+DATA_DIR = ’./MNIST/train’
+# Obté m seis amostras.
+mnist_dataset = ds.MnistDataset(
+DATA_DIR,
+num_samples=6,
+shuffle=False
+)
+# Visualiza a imagem original.
+mnist_it = mnist_dataset.create_dict_iterator()
+data = next(mnist_it)
+plt.imshow(
+data[’image’].asnumpy().squeeze(),
+cmap=plt.cm.gray
+)
+plt.title(data[’label’].asnumpy(), fontsize=20)
+plt.show()
+Resultado:
+Figura 2:Amostra de dados
+ES510-Introdução à IA– Prof. David Guerra – 2026 11
+
+Universidade Federal de Pernambuco (UFPE)
+Etapa 3– Aplicar aumento de dados.
+Código:
+resize_op = c_vision.Resize(
+size=(40,40),
+interpolation=Inter.LINEAR
+)
+crop_op = c_vision.RandomCrop(28)
+transforms_list = [resize_op, crop_op]
+mnist_dataset = mnist_dataset.map(
+operations=transforms_list,
+input_columns=["image"]
+)
+mnist_dataset = mnist_dataset.create_dict_iterator()
+data = next(mnist_dataset)
+plt.imshow(
+data[’image’].asnumpy().squeeze(),
+cmap=plt.cm.gray
+)
+plt.title(data[’label’].asnumpy(), fontsize=20)
+plt.show()
+Resultado:
+Figura 3:Efeito após ampliação dos dados
+ES510-Introdução à IA– Prof. David Guerra – 2026 12
+
+Universidade Federal de Pernambuco (UFPE)
+2.4 Criar Redes
+O MindSpore encapsula APIs para criação de camadas de redes neurais no módulonn.
+Diferentes tipos de camadas podem ser construídos utilizando essas APIs.
+Etapa 1– Construir uma camada totalmente conectada.
+Camada totalmente conectada:mindspore.nn.Dense
+•in_channels: canais de entrada
+•out_channels: canais de saída
+•weight_init: inicialização dos pesos
+Código:
+import mindspore as ms
+import mindspore.nn as nn
+from mindspore import Tensor
+import numpy as np
+# Constrói o tensor de entrada.
+input_a = Tensor(
+np.array([[1, 1, 1],
+[2, 2, 2]]),
+ms.float32
+)
+print(input_a)
+# Constrói uma camada totalmente conectada.
+net = nn.Dense(
+in_channels=3,
+out_channels=3,
+weight_init=1
+)
+output = net(input_a)
+print(output)
+Resultado:
+[[1. 1. 1.]
+[2. 2. 2.]]
+[[3. 3. 3.]
+[6. 6. 6.]]
+Etapa 2– Construir uma camada convolucional.
+Código:
+ES510-Introdução à IA– Prof. David Guerra – 2026 13
+
+Universidade Federal de Pernambuco (UFPE)
+conv2d = nn.Conv2d(
+1,
+6,
+5,
+has_bias=False,
+weight_init=’normal’,
+pad_mode=’valid’
+)
+input_x = Tensor(
+np.ones([1, 1, 32, 32]),
+ms.float32
+)
+print(conv2d(input_x).shape)
+Resultado:
+(1, 6, 28, 28)
+Etapa 3– Construir uma camada ReLU.
+Código:
+relu = nn.ReLU()
+input_x = Tensor(
+np.array([-1, 2, -3, 2, -1]),
+ms.float16
+)
+output = relu(input_x)
+print(output)
+Resultado:
+[0. 2. 0. 2. 0.]
+Etapa 4– Construir uma camada de pooling.
+Código:
+max_pool2d = nn.MaxPool2d(
+kernel_size=2,
+stride=2
+)
+input_x = Tensor(
+np.ones([1, 6, 28, 28]),
+ms.float32
+)
+ES510-Introdução à IA– Prof. David Guerra – 2026 14
+
+Universidade Federal de Pernambuco (UFPE)
+print(max_pool2d(input_x).shape)
+Resultado:
+(1, 6, 14, 14)
+Etapa 5– Construir uma camada Flatten.
+Código:
+flatten = nn.Flatten()
+input_x = Tensor(
+np.ones([1, 16, 5, 5]),
+ms.float32
+)
+output = flatten(input_x)
+print(output.shape)
+Resultado:
+(1, 400)
+Etapa 6– Definir uma classe de modelo e visualizar parâmetros.
+A classeCelldo MindSpore é a classe base para criação de redes neurais.
+Código:
+class LeNet5(nn.Cell):
+"""
+Estrutura da rede LeNet
+"""
+def __init__(self,
+num_class=10,
+num_channel=1):
+super(LeNet5, self).__init__()
+# Define operações necessárias.
+self.conv1 = nn.Conv2d(
+num_channel,
+6,
+5,
+pad_mode=’valid’
+)
+self.conv2 = nn.Conv2d(
+6,
+ES510-Introdução à IA– Prof. David Guerra – 2026 15
+
+Universidade Federal de Pernambuco (UFPE)
+16,
+5,
+pad_mode=’valid’
+)
+self.fc1 = nn.Dense(16 * 4 * 4, 120)
+self.fc2 = nn.Dense(120, 84)
+self.fc3 = nn.Dense(84, num_class)
+self.relu = nn.ReLU()
+self.max_pool2d = nn.MaxPool2d(
+kernel_size=2,
+stride=2
+)
+self.flatten = nn.Flatten()
+def construct(self, x):
+# Rede feedforward.
+x = self.conv1(x)
+x = self.relu(x)
+x = self.max_pool2d(x)
+x = self.conv2(x)
+x = self.relu(x)
+x = self.max_pool2d(x)
+x = self.flatten(x)
+x = self.fc1(x)
+x = self.relu(x)
+x = self.fc2(x)
+x = self.relu(x)
+x = self.fc3(x)
+return x
+# Instancia o modelo.
+modelle = LeNet5()
+# Visualiza os parâmetros do modelo.
+for m in modelle.parameters_and_names():
+print(m)
+ES510-Introdução à IA– Prof. David Guerra – 2026 16
+
+Universidade Federal de Pernambuco (UFPE)
+Resultado:
+(’conv1.weight’, Parameter (...))
+(’conv2.weight’, Parameter (...))
+(’fc1.weight’, Parameter (...))
+(’fc1.bias’, Parameter (...))
+(’fc2.weight’, Parameter (...))
+(’fc2.bias’, Parameter (...))
+(’fc3.weight’, Parameter (...))
+(’fc3.bias’, Parameter (...))
+2.5 Treinamento e Validação de Modelo
+Etapa 1– Utilizar funções de perda.
+Uma função de perda é utilizada para medir a diferença entre os valores previstos e os
+valores reais do modelo.
+Neste exemplo, utiliza-se a função de perdaL1Loss. O módulomindspore.nn.loss
+também fornece outras funções de perda, como:
+•SoftmaxCrossEntropyWithLogits
+•MSELoss
+•SmoothL1Loss
+Código:
+import numpy as np
+import mindspore.nn as nn
+from mindspore import Tensor
+import mindspore.dataset as ds
+import mindspore as ms
+loss = nn.L1Loss()
+output_data = Tensor(
+np.array([[1, 2, 3],
+[2, 3, 4]]).astype(np.float32)
+)
+target_data = Tensor(
+np.array([[0, 2, 5],
+[3, 1, 1]]).astype(np.float32)
+)
+print(loss(output_data, target_data))
+ES510-Introdução à IA– Prof. David Guerra – 2026 17
+
+Universidade Federal de Pernambuco (UFPE)
+Resultado:
+1.5
+Etapa 2– Utilizar um otimizador.
+Algoritmos comuns de otimização incluem:
+•SGD
+•Adam
+•Ftrl
+•Momentum
+•RMSprop
+•Lars
+•Lamb
+Neste exemplo, será utilizado o otimizadorMomentum.
+Código:
+optim = nn.Momentum(
+params=modelle.trainable_params(),
+learning_rate=0.1,
+momentum=0.9,
+weight_decay=0.0
+)
+Etapa 3– Construir o modelo.
+Estrutura:
+mindspore.Model(network, loss_fn, optimizer, metrics)
+Código:
+from mindspore import Model
+# Define a rede neural.
+net = LeNet5()
+# Define a função de perda.
+loss = nn.SoftmaxCrossEntropyWithLogits(
+sparse=True,
+reduction=’mean’
+)
+# Define o otimizador.
+optim = nn.Momentum(
+params=net.trainable_params(),
+ES510-Introdução à IA– Prof. David Guerra – 2026 18
+
+Universidade Federal de Pernambuco (UFPE)
+learning_rate=0.1,
+momentum=0.9
+)
+# Constrói o modelo.
+model = Model(
+network=net,
+loss_fn=loss,
+optimizer=optim,
+metrics={’accuracy’}
+)
+Etapa 4– Treinar o modelo.
+Código:
+import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.vision.c_transforms as CV
+from mindspore.train.callback import LossMonitor
+DATA_DIR = ’./MNIST/train’
+mnist_dataset = ds.MnistDataset(DATA_DIR)
+resize_op = CV.Resize((28,28))
+rescale_op = CV.Rescale(1/255,0)
+hwc2chw_op = CV.HWC2CHW()
+mnist_dataset = mnist_dataset.map(
+input_columns="image",
+operations=[
+rescale_op,
+resize_op,
+hwc2chw_op
+]
+)
+mnist_dataset = mnist_dataset.map(
+input_columns="label",
+operations=C.TypeCast(ms.int32)
+)
+mnist_dataset = mnist_dataset.batch(32)
+loss_cb = LossMonitor(per_print_times=1000)
+# epoch indica o número de é pocas.
+model.train(
+epoch=1,
+ES510-Introdução à IA– Prof. David Guerra – 2026 19
+
+Universidade Federal de Pernambuco (UFPE)
+train_dataset=mnist_dataset,
+callbacks=[loss_cb]
+)
+Etapa 5– Validar o modelo.
+Código:
+# Conjunto de teste.
+DATA_DIR = ’./forward_mnist/MNIST/test’
+dataset = ds.MnistDataset(DATA_DIR)
+resize_op = CV.Resize((28,28))
+rescale_op = CV.Rescale(1/255,0)
+hwc2chw_op = CV.HWC2CHW()
+dataset = dataset.map(
+input_columns="image",
+operations=[
+rescale_op,
+resize_op,
+hwc2chw_op
+]
+)
+dataset = dataset.map(
+input_columns="label",
+operations=C.TypeCast(ms.int32)
+)
+dataset = dataset.batch(32)
+model.eval(valid_dataset=dataset)
+2.6 Salvamento e Carregamento de Modelos
+Após o treinamento, o modelo pode ser salvo de duas formas.
+1. Uma delas é simplesmente salvar o modelo de rede antes ou depois do treinamento. A
+vantagem é que a API é fácil de usar, mas apenas o status do modelo de rede no momento
+de execução do comando é mantido.
+Código:
+import mindspore as ms
+# Salva o modelo.
+ms.save_checkpoint(
+net,
+"./MyNet.ckpt"
+ES510-Introdução à IA– Prof. David Guerra – 2026 20
+
+Universidade Federal de Pernambuco (UFPE)
+)
+Resultado:
+epoch: 1 step: 1000, loss is 2.283555746078491
+2. A outra vantagem é poder salvar a interface durante o treinamento do modelo de rede.
+MindSpore salva automaticamente o número de períodos e o número de etapas definidas
+durante o treinamento. Ou seja, os parâmetros de peso intermediário gerados durante o
+processo de treinamento do modelo também serão salvos para facilitar o ajuste fino da
+rede e interromper o treinamento.
+Código:
+from mindspore.train.callback import (
+ModelCheckpoint,
+CheckpointConfig
+)
+# Número de é pocas.
+epoch_num = 5
+# Configuração de checkpoints.
+config_ck = CheckpointConfig(
+save_checkpoint_steps=1875,
+keep_checkpoint_max=10
+)
+# Define o callback.
+ckpoint = ModelCheckpoint(
+prefix="lenet",
+directory="./lenet",
+config=config_ck
+)
+# Treinamento.
+model.train(
+epoch_num,
+mnist_dataset,
+callbacks=[ckpoint]
+)
+2.7 Diferenciação Automática
+A propagação reversa (backpropagation) é o algoritmo mais utilizado no treinamento de
+redes neurais. Nesse algoritmo, os parâmetros do modelo são ajustados com base no
+gradiente da função de perda.
+O método de derivada de primeira ordem do MindSpore é:
+mindspore.ops.GradOperation(
+ES510-Introdução à IA– Prof. David Guerra – 2026 21
+
+Universidade Federal de Pernambuco (UFPE)
+get_all=False,
+get_by_list=False,
+sens_param=False
+)
+•Quandoget_all=False, apenas a primeira derivada da entrada é calculada.
+•Quandoget_all=True, todas as derivadas das entradas são calculadas.
+•Quandoget_by_list=False, derivadas dos pesos não são calculadas.
+•Quandoget_by_list=True, derivadas dos pesos são calculadas.
+•O parâmetrosens_paramcontrola o escalonamento do gradiente.
+O exemplo a seguir utiliza a operaçãoMatMulpara demonstrar o cálculo de derivadas.
+Etapa 1– Calcular a derivada da entrada.
+Para calcular derivadas da entrada, é necessário definir uma rede neural.
+Neste exemplo, será utilizada uma rede:
+f(x, y) =z·x·y
+Código:
+import numpy as np
+import mindspore.nn as nn
+import mindspore.ops as ops
+from mindspore import Tensor
+from mindspore import ParameterTuple
+from mindspore import Parameter
+from mindspore import dtype as mstype
+class Net(nn.Cell):
+def __init__(self):
+super(Net, self).__init__()
+self.matmul = ops.MatMul()
+self.z = Parameter(
+Tensor(
+np.array([1.0], np.float32)
+),
+name=’z’
+)
+ES510-Introdução à IA– Prof. David Guerra – 2026 22
+
+Universidade Federal de Pernambuco (UFPE)
+def construct(self, x, y):
+x = x * self.z
+out = self.matmul(x, y)
+return out
+class GradNetWrtX(nn.Cell):
+def __init__(self, net):
+super(GradNetWrtX, self).__init__()
+self.net = net
+self.grad_op = ops.GradOperation()
+def construct(self, x, y):
+gradient_function = self.grad_op(self.net)
+return gradient_function(x, y)
+x = Tensor(
+[[0.8, 0.6, 0.2],
+[1.8, 1.3, 1.1]],
+dtype=mstype.float32
+)
+y = Tensor(
+[[0.11, 3.3, 1.1],
+[1.1, 0.2, 1.4],
+[1.1, 2.2, 0.3]],
+dtype=mstype.float32
+)
+output = GradNetWrtX(Net())(x, y)
+print(output)
+Resultado:
+[[4.5099998 2.7 3.6000001]
+[4.5099998 2.7 3.6000001]]
+Etapa 2– Calcular a derivada dos pesos.
+Para calcular derivadas dos pesos, defina:
+ES510-Introdução à IA– Prof. David Guerra – 2026 23
+
+Universidade Federal de Pernambuco (UFPE)
+get_by_list=True
+Caso determinadas derivadas não sejam necessárias, defina:
+requires_grad=False
+Código:
+class GradNetWrtX(nn.Cell):
+def __init__(self, net):
+super(GradNetWrtX, self).__init__()
+self.net = net
+self.params = ParameterTuple(
+net.trainable_params()
+)
+self.grad_op = ops.GradOperation(
+get_by_list=True
+)
+def construct(self, x, y):
+gradient_function = self.grad_op(
+self.net,
+self.params
+)
+return gradient_function(x, y)
+output = GradNetWrtX(Net())(x, y)
+print(output)
+Resultado:
+(Tensor(shape=[1], dtype=Float32,
+value= [ 2.15359993e+01]),)
+2.8 Questão
+Quando o seguinte código é utilizado para criar dois tensorest1et2, o tensort1pode
+ser criado corretamente? Verifique se ambos os tensores possuem a mesma saída. Caso
+contrário, qual é a diferença?
+t1 = Tensor(
+ES510-Introdução à IA– Prof. David Guerra – 2026 24
+
+Universidade Federal de Pernambuco (UFPE)
+np.array([[1.2, 2.2],
+[3.2, 4.2]]),
+dtype.int32
+)
+t2 = Tensor(
+np.array([[1.2, 2.2],
+[3.2, 4.2]]),
+dtype.float32
+)
+3 Reconhecimento de caracteres escritos a mão MNIST
+3.1 Sobre Esta Atividade
+Este exercício implementa o reconhecimento de caracteres escritos a mão MNIST, que é
+um caso típico no campo de Deep Learning. Todo o processo é o seguinte:
+•Processe o conjunto de dados necessário. (O conjunto de dados MNIST é usado
+neste exemplo.)
+•Defina uma rede. (Uma rede totalmente conectada simples é criada neste exemplo.)
+•Defina uma função de perda e um otimizador.
+•Carregue o conjunto de dados e execute o treinamento. Após a conclusão do trei-
+namento, use o conjunto de testes para validação.
+3.1.1 Preparação dos Dados
+OconjuntodedadosMNISTutilizadonesteexperimentoconsisteem10classesdeimagens
+em tons de cinza com dimensão de28×28pixels. O dataset possui:
+•60.000 imagens no conjunto de treinamento;
+•10.000 imagens no conjunto de teste.
+Faça o download do dataset MNIST:
+Código:
+from download import download
+url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/" \
+"notebook/datasets/MNIST_Data.zip"
+path = download(url, "./", kind="zip", replace=True)
+Os dois primeiros arquivos correspondem aos dados de treinamento e os dois últimos
+aos dados de teste.
+Após o download, descompacte os arquivos e organize-os nos diretórios:
+ES510-Introdução à IA– Prof. David Guerra – 2026 25
+
+Universidade Federal de Pernambuco (UFPE)
+MNIST/
+|-- test/
+| |-- t10k-images.idx3-ubyte
+| ‘-- t10k-labels.idx1-ubyte
+|
+‘-- train/
+|-- train-images.idx3-ubyte
+‘-- train-labels.idx1-ubyte
+3.1.2 Procedimento
+Etapa 1– Importar bibliotecas e configurar o ambiente de execução.
+Código:
+# Importa bibliotecas necessárias.
+import os
+from matplotlib import pyplot as plt
+import numpy as np
+import mindspore as ms
+import mindspore.context as context
+import mindspore.dataset as ds
+import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.vision.c_transforms as CV
+from mindspore.nn.metrics import Accuracy
+from mindspore import nn
+from mindspore.train import Model
+from mindspore.train.callback import (
+ModelCheckpoint,
+CheckpointConfig,
+LossMonitor,
+TimeMonitor
+)
+# Configuração do contexto de execução.
+context.set_context(
+mode=context.GRAPH_MODE,
+device_target=’CPU’
+)
+ES510-Introdução à IA– Prof. David Guerra – 2026 26
+
+Universidade Federal de Pernambuco (UFPE)
+O modo gráfico (GRAPH_MODE) é utilizado neste experimento. Caso o código seja exe-
+cutado em outros dispositivos, como GPU ou Ascend, o parâmetrodevice_targetdeve
+ser alterado adequadamente.
+Etapa 2– Ler os conjuntos de treinamento e teste.
+Código:
+DATA_DIR_TRAIN = "MNIST/train"
+DATA_DIR_TEST = "MNIST/test"
+# Leitura dos datasets.
+ds_train = ds.MnistDataset(DATA_DIR_TRAIN)
+ds_test = ds.MnistDataset(DATA_DIR_TEST)
+# Visualização das informações do dataset.
+print(
+’Data volume of the training dataset:’,
+ds_train.get_dataset_size()
+)
+print(
+’Data volume of the test dataset:’,
+ds_test.get_dataset_size()
+)
+image = ds_train.create_dict_iterator().__next__()
+print(
+’Image length/width/channels:’,
+image[’image’].shape
+)
+print(
+’Image label style:’,
+image[’label’]
+)
+Etapa 3– Processar os dados.
+O processamento adequado dos dados pode melhorar significativamente a precisão e
+eficiência do treinamento.
+Código:
+def create_dataset(
+training=True,
+batch_size=128,
+resize=(28, 28),
+rescale=1/255,
+shift=0,
+ES510-Introdução à IA– Prof. David Guerra – 2026 27
+
+Universidade Federal de Pernambuco (UFPE)
+buffer_size=64
+):
+ds = ms.dataset.MnistDataset(
+DATA_DIR_TRAIN if training
+else DATA_DIR_TEST
+)
+# Operações de processamento.
+resize_op = CV.Resize(resize)
+rescale_op = CV.Rescale(
+rescale,
+shift
+)
+hwc2chw_op = CV.HWC2CHW()
+# Operações de mapeamento.
+ds = ds.map(
+input_columns="image",
+operations=[
+rescale_op,
+resize_op,
+hwc2chw_op
+]
+)
+ds = ds.map(
+input_columns="label",
+operations=C.TypeCast(ms.int32)
+)
+# Embaralhamento e divisão em lotes.
+ds = ds.shuffle(
+buffer_size=buffer_size
+)
+ds = ds.batch(
+batch_size,
+drop_remainder=True
+)
+return ds
+O parâmetrobatch_sizeindica o número de amostras por lote. O parâmetro
+drop_remainder=Truedescarta amostras que não consigam completar um lote.
+Etapa 4– Visualizar amostras do dataset.
+ES510-Introdução à IA– Prof. David Guerra – 2026 28
+
+Universidade Federal de Pernambuco (UFPE)
+Código:
+# Exibe as 10 primeiras imagens.
+ds = create_dataset(training=False)
+data = ds.create_dict_iterator().__next__()
+images = data[’image’].asnumpy()
+labels = data[’label’].asnumpy()
+plt.figure(figsize=(15,5))
+for i in range(1,11):
+plt.subplot(2, 5, i)
+plt.imshow(np.squeeze(images[i]))
+plt.title(’Number: %s’ % labels[i])
+plt.xticks([])
+plt.show()
+Resultado:
+Figura 4:Visualização das amostras do dataset MNIST
+Etapa 5– Definir a rede neural.
+A rede utilizada possui três camadas totalmente conectadas:
+•Camada 1:784×512
+•Camada 2:512×128
+•Camada 3:128×10
+ES510-Introdução à IA– Prof. David Guerra – 2026 29
+
+Universidade Federal de Pernambuco (UFPE)
+Código:
+# Rede neural totalmente conectada.
+class ForwardNN(nn.Cell):
+def __init__(self):
+super(ForwardNN, self).__init__()
+self.flatten = nn.Flatten()
+self.fc1 = nn.Dense(
+784,
+512,
+activation=’relu’
+)
+self.fc2 = nn.Dense(
+512,
+128,
+activation=’relu’
+)
+self.fc3 = nn.Dense(
+128,
+10,
+activation=None
+)
+def construct(self, input_x):
+output = self.flatten(input_x)
+output = self.fc1(output)
+output = self.fc2(output)
+output = self.fc3(output)
+return output
+Etapa 6– Definir função de perda e otimizador.
+Código:
+# Hiperparâmetros.
+lr = 0.001
+ES510-Introdução à IA– Prof. David Guerra – 2026 30
+
+Universidade Federal de Pernambuco (UFPE)
+num_epoch = 10
+momentum = 0.9
+# Criação da rede.
+net = ForwardNN()
+# Função de perda.
+loss = nn.loss.SoftmaxCrossEntropyWithLogits(
+sparse=True,
+reduction=’mean’
+)
+# Mé trica.
+metrics = {"Accuracy": Accuracy()}
+# Otimizador.
+opt = nn.Adam(
+net.trainable_params(),
+lr
+)
+Etapa 7– Iniciar o treinamento.
+O processo de treinamento consiste em enviar os dados do conjunto de treinamento
+para a rede neural, realizando a atualização dos parâmetros do modelo.
+No MindSpore, o treinamento é realizado utilizando o método:
+Model.train()
+Código:
+# Constrói o modelo.
+model = Model(
+net,
+loss,
+opt,
+metrics
+)
+# Configuração de checkpoints.
+config_ck = CheckpointConfig(
+save_checkpoint_steps=1875,
+keep_checkpoint_max=10
+)
+ckpoint_cb = ModelCheckpoint(
+prefix="checkpoint_net",
+directory="./ckpt",
+config=config_ck
+ES510-Introdução à IA– Prof. David Guerra – 2026 31
+
+Universidade Federal de Pernambuco (UFPE)
+)
+# Geração dos datasets.
+ds_eval = create_dataset(
+False,
+batch_size=32
+)
+ds_train = create_dataset(
+batch_size=32
+)
+# Treinamento.
+loss_cb = LossMonitor(
+per_print_times=1875
+)
+time_cb = TimeMonitor(
+data_size=ds_train.get_dataset_size()
+)
+print(
+"============== Starting Training =============="
+)
+model.train(
+num_epoch,
+ds_train,
+callbacks=[
+ckpoint_cb,
+loss_cb,
+time_cb
+],
+dataset_sink_mode=False
+)
+Embora os valores da função de perda possam oscilar durante o treinamento, espera-se
+que, em média, eles diminuam gradualmente, enquanto a acurácia aumenta.
+Os valores exibidos podem variar devido à aleatoriedade do processo de treinamento.
+Exemplo de saída:
+============== Starting Training ==============
+epoch: 1 step: 1875, loss is 0.06333521
+epoch time: 18669.680 ms,
+per step time: 9.957 ms
+epoch: 2 step: 1875, loss is 0.07061358
+epoch time: 21463.662 ms,
+ES510-Introdução à IA– Prof. David Guerra – 2026 32
+
+Universidade Federal de Pernambuco (UFPE)
+per step time: 11.447 ms
+epoch: 3 step: 1875, loss is 0.043515638
+epoch time: 25836.919 ms,
+per step time: 13.780 ms
+epoch: 4 step: 1875, loss is 0.03468642
+epoch time: 25553.150 ms,
+per step time: 13.628 ms
+epoch: 5 step: 1875, loss is 0.03934026
+epoch time: 27364.246 ms,
+per step time: 14.594 ms
+epoch: 6 step: 1875, loss is 0.0023852987
+epoch time: 31432.281 ms,
+per step time: 16.764 ms
+epoch: 7 step: 1875, loss is 0.010915326
+epoch time: 33697.183 ms,
+per step time: 17.972 ms
+epoch: 8 step: 1875, loss is 0.011417691
+epoch time: 29594.438 ms,
+per step time: 15.784 ms
+epoch: 9 step: 1875, loss is 0.00044568744
+epoch time: 28676.948 ms,
+per step time: 15.294 ms
+epoch: 10 step: 1875, loss is 0.071476705
+epoch time: 34999.863 ms,
+per step time: 18.667 ms
+Etapa 8– Validar o modelo.
+Nesta etapa, o conjunto de teste é utilizado para avaliar o desempenho do modelo
+treinado.
+Código:
+# Utiliza o conjunto de teste para validação.
+metrics = model.eval(ds_eval)
+print(metrics)
+Resultado:
+{’Accuracy’: 0.9740584935897436}
+ES510-Introdução à IA– Prof. David Guerra – 2026 33
+
+Universidade Federal de Pernambuco (UFPE)
+3.2 Exercício Proposto: Interface Gráfica para Teste do Modelo MNIST
+Neste exercício, você deverá desenvolver uma interface gráfica utilizando a biblioteca
+PyQt5para permitir que o usuário desenhe manualmente dígitos numéricos e utilize o
+modelo treinado anteriormente para realizar a predição da classe correspondente.
+O objetivo deste exercício é integrar conceitos de:
+•Desenvolvimento de interfaces gráficas;
+•Processamento de imagens;
+•Pré-processamento de dados;
+•Inferência em modelos de Deep Learning;
+•Integração entre aplicações e modelos treinados.
+3.2.1 Objetivo
+Desenvolver uma aplicação gráfica em Python capaz de:
+1. Permitir ao usuário desenhar um dígito manualmente;
+2. Capturar o desenho realizado;
+3. Converter a imagem para o formato esperado pela rede neural;
+4. Carregar o modelo treinado no laboratório;
+5. Realizar a predição do dígito desenhado;
+6. Exibir o resultado da classificação na interface gráfica.
+3.2.2 Requisitos
+A aplicação deve possuir:
+•Uma área de desenho (canvas);
+•Um botão para limpar o desenho;
+•Um botão para realizar a predição;
+•Um campo textual para exibir o número previsto pela rede neural.
+ES510-Introdução à IA– Prof. David Guerra – 2026 34
+
+Universidade Federal de Pernambuco (UFPE)
+3.2.3 Etapas Esperadas
+1. Criar uma janela utilizandoPyQt5;
+2. Implementar uma área de desenho utilizando eventos do mouse;
+3. Capturar a imagem desenhada pelo usuário;
+4. Converter a imagem para escala de cinza;
+5. Redimensionar a imagem para28×28pixels;
+6. Normalizar os valores dos pixels;
+7. Converter os dados para tensor do MindSpore;
+8. Carregar o modelo previamente treinado;
+9. Realizar a inferência da imagem;
+10. Exibir a classe prevista na interface.
+3.2.4 Bibliotecas Recomendadas
+Você poderá utilizar as seguintes bibliotecas:
+PyQt5
+numpy
+opencv-python
+Pillow
+mindspore
+3.2.5 Estrutura Esperada
+A aplicação deverá seguir, de forma geral, o fluxo ilustrado abaixo:
+Canvas de desenho→Captura da imagem→Pré-processamento→Tensor MindSpore
+→Predição da rede neural→Exibição do resultado
+3.2.6 Sugestões
+•Utilize imagens em tons de cinza;
+•Inverta as cores, se necessário, para manter o mesmo padrão do MNIST;
+•Teste diferentes espessuras de pincel;
+•Utilize o métodoargmax()para identificar a classe prevista;
+•Salve imagens temporariamente para depuração, caso necessário.
+ES510-Introdução à IA– Prof. David Guerra – 2026 35
+
+Universidade Federal de Pernambuco (UFPE)
+3.2.7 Desafio Extra (Opcional)
+Implemente funcionalidades adicionais, tais como:
+•Exibição das probabilidades de cada classe;
+•Predição em tempo real;
+•Escolha da espessura do pincel;
+•Suporte a GPU;
+•Salvamento automático dos desenhos realizados.
+4 Classificação de Imagem MobileNetV2
+4.1 Introdução
+Neste exercício, a rede leve MobileNetV2 é utilizada para classificar conjuntos de dados
+de imagens de flores.
+4.2 Preparações
+Antes de começar, verifique se o MindSpore foi instalado corretamente. Recomenda-se
+instalar o MindSpore no computador acessando o site oficial:
+https://www.mindspore.cn/install/en
+Além disso, é necessário possuir conhecimentos básicos em:
+•Programação em Python;
+•Probabilidade;
+•Matrizes;
+•Conceitos básicos de matemática.
+Ambiente recomendado:
+•Versão do MindSpore: 1.7
+•Linguagem de programação: Python 3.7
+ES510-Introdução à IA– Prof. David Guerra – 2026 36
+
+Universidade Federal de Pernambuco (UFPE)
+4.3 Projeto e Implementação
+4.3.1 Preparação dos Dados
+O conjunto de dados de imagens de flores utilizado neste exercício é um dataset de código
+aberto contendo cinco tipos de flores:
+•Margaridas (633 imagens)
+•Dentes-de-leão (898 imagens)
+•Rosas (641 imagens)
+•Girassóis (699 imagens)
+•Tulipas (799 imagens)
+O dataset contém 3670 imagens, totalizando aproximadamente 230 MB, armazenadas
+em cinco diretórios distintos. Para facilitar os testes do modelo, o conjunto de dados é
+dividido em:
+•flower_photos_train
+•flower_photos_test
+A estrutura de diretórios é:
+flower_photos_train
+|-- daisy
+|-- dandelion
+|-- roses
+|-- sunflowers
+|-- tulips
+‘-- LICENSE.txt
+flower_photos_test
+|-- daisy
+|-- dandelion
+|-- roses
+|-- sunflowers
+|-- tulips
+‘-- LICENSE.txt
+Os datasets podem ser obtidos em:
+•https://ascend-professional-construction-dataset.obs.myhuaweicloud.
+com/deep-learning/flower_photos_train.zip
+•https://ascend-professional-construction-dataset.obs.myhuaweicloud.
+com/deep-learning/flower_photos_test.zip
+ES510-Introdução à IA– Prof. David Guerra – 2026 37
+
+Universidade Federal de Pernambuco (UFPE)
+4.3.2 Procedimento
+Etapa 1– Carregar o conjunto de dados.
+Defina a funçãocreate_dataset, utilize a APIImageFolderDatasetpara carregar o
+conjunto de dados de classificação de flores e realize o aumento de dados das imagens.
+Código:
+import mindspore.dataset as ds
+import mindspore.dataset.vision.c_transforms as CV
+from mindspore import dtype as mstype
+train_data_path = ’flower_photos_train’
+val_data_path = ’flower_photos_test’
+def create_dataset(data_path, batch_size=18, training=True):
+"""Define the dataset."""
+data_set = ds.ImageFolderDataset(data_path, num_parallel_workers=8,
+shuffle=True, class_indexing={’daisy’: 0, ’dandelion’: 1,
+’roses’: 2, ’sunflowers’: 3, ’tulips’: 4})
+# Realize o aprimoramento das imagens no conjunto de dados.
+image_size = 224
+mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
+std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
+if training:
+trans = [
+CV.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=
+(0.75, 1.333)), CV.RandomHorizontalFlip(prob=0.5),
+CV.Normalize(mean=mean, std=std), CV.HWC2CHW()
+]
+else:
+trans = [
+CV.Decode(),
+CV.Resize(256),
+CV.CenterCrop(image_size),
+CV.HWC2CHW()
+]
+# Execute as operações de mapeamento de dados, em lote e de repetição.
+data_set = data_set.map(operations=trans, input_columns="image",
+num_parallel_workers=8)
+# Defina o valor de batch_size. Descarte as amostras se o número de
+# amostras retornadas na última iteração for menor que o valor de
+# batch_size.
+data_set = data_set.batch(batch_size, drop_remainder=True)
+return data_set
+ES510-Introdução à IA– Prof. David Guerra – 2026 38
+
+Universidade Federal de Pernambuco (UFPE)
+dataset_train = create_dataset(train_data_path)
+dataset_val = create_dataset(val_data_path)
+Etapa 2– Visualizar o conjunto de dados.
+O valor retornado da APIcreate_dataseté um dicionário. A API
+create_dict_iteratorpode ser utilizada para criar um iterador de dados e acessar o
+dataset iterativamente.
+Neste exemplo,batch_sizeé definido como 18, permitindo obter 18 imagens e rótulos
+por iteração.
+Código:
+import matplotlib.pyplot as plt
+import numpy as np
+data = next(dataset_train.create_dict_iterator())
+images = data["image"]
+labels = data["label"]
+print("Tensor of image", images.shape)
+print("Labels:", labels)
+# class_name é correspondente com label. Os rótulos são marcados em ordem
+# crescente da sequência de caracteres da pasta.
+class_name = {0:’daisy’,1:’dandelion’,2:’roses’,3:’sunflowers’,4:’tulips’}
+plt.figure(figsize=(15, 7))
+for i in range(len(labels)):
+# Obtenha a imagem e seu rótulo.
+data_image = images[i].asnumpy()
+data_label = labels[i]
+# Processa imagens para exibição.
+data_image = np.transpose(data_image, (1, 2, 0))
+mean = np.array([0.485, 0.456, 0.406])
+std = np.array([0.229, 0.224, 0.225])
+data_image = std * data_image + mean
+data_image = np.clip(data_image, 0, 1)
+# Exibe a imagem.
+plt.subplot(3, 6, i + 1)
+plt.imshow(data_image)
+plt.title(class_name[int(labels[i].asnumpy())])
+plt.axis("off")
+plt.show()
+Resultado:
+ES510-Introdução à IA– Prof. David Guerra – 2026 39
+
+Universidade Federal de Pernambuco (UFPE)
+Figura 5:Visualização do conjunto de dados
+Etapa 3– Criar o modelo MobileNetV2.
+Os conjuntos de dados são fundamentais para o treinamento. Um bom conjunto de
+dados pode melhorar significativamente a precisão e eficiência do treinamento.
+A MobileNet é uma rede neural convolucional leve proposta pelo Google em 2017,
+voltada para dispositivos móveis, embarcados e IoT. Comparada às CNNs tradicionais, a
+MobileNet reduz significativamente o número de parâmetros mantendo boa precisão.
+Além disso, os coeficientes de larguraαe resoluçãoβsão introduzidos para atender
+diferentes cenários de aplicação.
+Como a função de ativação ReLU pode causar perda de informações em representações
+de baixa dimensão, a MobileNetV2 utiliza:
+•Blocos residuais invertidos;
+•Gargalos lineares.
+Essa estratégia melhora a precisão e reduz ainda mais o tamanho do modelo.
+Figura 6:Visualização do conjunto de dados
+ES510-Introdução à IA– Prof. David Guerra – 2026 40
+
+Universidade Federal de Pernambuco (UFPE)
+Na estrutura residual invertida:
+•Convolução1×1é utilizada para aumento de dimensão;
+•Convolução profunda3×3é aplicada;
+•Outra convolução1×1realiza redução de dimensão.
+Essa estrutura é inversa à utilizada em blocos residuais tradicionais.
+Para mais detalhes, consulte o artigo original da MobileNetV2:
+https://arxiv.org/pdf/1801.04381.pdf
+Código:
+import numpy as np
+import mindspore as ms
+import mindspore.nn as nn
+import mindspore.ops as ops
+def _make_divisible(v, divisor, min_value=None):
+if min_value is None:
+min_value = divisor
+new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
+# Verifique se o arredondamento para baixo não é maior que 10%.
+if new_v < 0.9 * v:
+new_v += divisor
+return new_v
+class GlobalAvgPooling(nn.Cell):
+def __init__(self):
+super(GlobalAvgPooling, self).__init__()
+self.mean = ops.ReduceMean(keep_dims=False)
+def construct(self, x):
+x = self.mean(x, (2, 3))
+return x
+class ConvBNReLU(nn.Cell):
+def __init__(self, in_planes, out_planes, kernel_size=3, stride=1, groups=1):
+super(ConvBNReLU, self).__init__()
+padding = (kernel_size - 1) // 2
+in_channels = in_planes
+out_channels = out_planes
+if groups == 1:
+conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+pad_mode=’pad’, padding=padding)
+else:
+out_channels = in_planes
+ES510-Introdução à IA– Prof. David Guerra – 2026 41
+
+Universidade Federal de Pernambuco (UFPE)
+conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+pad_mode=’pad’, padding=padding, group=in_channels)
+layers = [conv, nn.BatchNorm2d(out_planes), nn.ReLU6()]
+self.features = nn.SequentialCell(layers)
+def construct(self, x):
+output = self.features(x)
+return output
+class InvertedResidual(nn.Cell):
+def __init__(self, inp, oup, stride, expand_ratio):
+super(InvertedResidual, self).__init__()
+assert stride in [1, 2]
+hidden_dim = int(round(inp * expand_ratio))
+self.use_res_connect = stride == 1 and inp == oup
+layers = []
+if expand_ratio != 1:
+layers.append(ConvBNReLU(inp, hidden_dim, kernel_size=1))
+layers.extend([
+# dw
+ConvBNReLU(hidden_dim, hidden_dim,
+stride=stride, groups=hidden_dim),
+# pw-linear
+nn.Conv2d(hidden_dim, oup, kernel_size=1,
+stride=1, has_bias=False),
+nn.BatchNorm2d(oup),
+])
+self.conv = nn.SequentialCell(layers)
+self.add = ops.Add()
+self.cast = ops.Cast()
+def construct(self, x):
+identity = x
+x = self.conv(x)
+if self.use_res_connect:
+return self.add(identity, x)
+return x
+class MobileNetV2Backbone(nn.Cell):
+def __init__(self, width_mult=1., inverted_residual_setting=None,
+round_nearest=8, input_channel=32, last_channel=1280):
+super(MobileNetV2Backbone, self).__init__()
+block = InvertedResidual
+ES510-Introdução à IA– Prof. David Guerra – 2026 42
+
+Universidade Federal de Pernambuco (UFPE)
+# Configure blocos residuais invertidos
+self.cfgs = inverted_residual_setting
+if inverted_residual_setting is None:
+self.cfgs = [
+# t, c, n, s
+[1, 16, 1, 1],
+[6, 24, 2, 2],
+[6, 32, 3, 2],
+[6, 64, 4, 2],
+[6, 96, 3, 1],
+[6, 160, 3, 2],
+[6, 320, 1, 1],
+]
+# Crie a primeira camada
+input_channel = _make_divisible(input_channel * width_mult, round_nearest)
+self.out_channels = _make_divisible(last_channel * max(1.0, width_mult),
+round_nearest)
+features = [ConvBNReLU(3, input_channel, stride=2)]
+# Crie blocos residuais invertidos
+for t, c, n, s in self.cfgs:
+output_channel = _make_divisible(c * width_mult, round_nearest)
+for i in range(n):
+stride = s if i == 0 else 1
+features.append(block(input_channel, output_channel, stride,
+expand_ratio=t))
+input_channel = output_channel
+# Crie as últimas camadas
+features.append(ConvBNReLU(input_channel, self.out_channels,
+kernel_size=1))
+# Torne-as nn.CellList
+self.features = nn.SequentialCell(features)
+self._initialize_weights()
+def construct(self, x):
+x = self.features(x)
+return x
+def _initialize_weights(self):
+self.init_parameters_data()
+for _, m in self.cells_and_names():
+if isinstance(m, nn.Conv2d):
+n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+m.weight.set_data(ms.Tensor(np.random.normal(0, np.sqrt(2. / n),
+m.weight.data.shape).astype("float32")))
+if m.bias is not None:
+m.bias.set_data(
+ES510-Introdução à IA– Prof. David Guerra – 2026 43
+
+Universidade Federal de Pernambuco (UFPE)
+ms.numpy.zeros(m.bias.data.shape, dtype="float32"))
+elif isinstance(m, nn.BatchNorm2d):
+m.gamma.set_data(
+ms.Tensor(np.ones(m.gamma.data.shape, dtype="float32")))
+m.beta.set_data(
+ms.numpy.zeros(m.beta.data.shape, dtype="float32"))
+@property
+def get_features(self):
+return self.features
+class MobileNetV2Head(nn.Cell):
+def __init__(self, input_channel=1280, num_classes=1000, has_dropout=False,
+activation="None"):
+super(MobileNetV2Head, self).__init__()
+# Mobilenet head
+head = ([GlobalAvgPooling()] if not has_dropout else
+[GlobalAvgPooling(), nn.Dropout(0.2)])
+self.head = nn.SequentialCell(head)
+self.dense = nn.Dense(input_channel, num_classes, has_bias=True)
+self.need_activation = True
+if activation == "Sigmoid":
+self.activation = ops.Sigmoid()
+elif activation == "Softmax":
+self.activation = ops.Softmax()
+else:
+self.need_activation = False
+self._initialize_weights()
+def construct(self, x):
+x = self.head(x)
+x = self.dense(x)
+if self.need_activation:
+x = self.activation(x)
+return x
+def _initialize_weights(self):
+self.init_parameters_data()
+for _, m in self.cells_and_names():
+if isinstance(m, nn.Dense):
+m.weight.set_data(ms.Tensor(np.random.normal(
+0, 0.01, m.weight.data.shape).astype("float32")))
+if m.bias is not None:
+m.bias.set_data(
+ms.numpy.zeros(m.bias.data.shape, dtype="float32"))
+ES510-Introdução à IA– Prof. David Guerra – 2026 44
+
+Universidade Federal de Pernambuco (UFPE)
+class MobileNetV2Combine(nn.Cell):
+def __init__(self, backbone, head):
+super(MobileNetV2Combine, self).__init__(auto_prefix=False)
+self.backbone = backbone
+self.head = head
+def construct(self, x):
+x = self.backbone(x)
+x = self.head(x)
+return x
+def mobilenet_v2(num_classes):
+backbone_net = MobileNetV2Backbone()
+head_net = MobileNetV2Head(backbone_net.out_channels,num_classes)
+return MobileNetV2Combine(backbone_net, head_net)
+Etapa 4– Treinar e validar o modelo.
+Após criar o modelo, a função de perda e o otimizador, utiliza-se a APIModel
+para inicializar o modelo. A APImodel.train()é utilizada para treinamento e a API
+model.eval()para validação.
+Esta etapa utiliza aprendizado por transferência (transfer learning).
+1. Baixar um modelo pré-treinado;
+2. Ler o modelo pré-treinado;
+3. Modificar os parâmetros do modelo.
+O modelo pré-treinado utilizado foi treinado no dataset ImageNet e pode ser baixado
+em:
+https://download.mindspore.cn/models/r1.7/mobilenetv2_ascend_v170_
+imagenet2012_official_cv_top1acc71.88.ckpt
+O modelo ImageNet classifica 1001 classes, enquanto este exercício classifica apenas
+cinco tipos de flores. Portanto, a última camada totalmente conectada é modificada.
+Código:
+import mindspore
+import mindspore.nn as nn
+from mindspore.train import Model
+from mindspore import Tensor, save_checkpoint
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
+# Crie o modelo. A quantidade de classes alvo é 5.
+network = mobilenet_v2(5)
+# Carregue o peso pré -treinado.
+param_dict = load_checkpoint("./mobilenetv2_ascend_v170_imagenet2012_official_
+cv_top1acc71.88.ckpt")
+ES510-Introdução à IA– Prof. David Guerra – 2026 45
+
+Universidade Federal de Pernambuco (UFPE)
+# Modifique os dados de peso com base na estrutura modificada do modelo.
+param_dict["dense.weight"] = mindspore.Parameter(Tensor(param_dict["dense.
+weight"][:5, :],mindspore.float32), name="dense.weight",
+requires_grad=True)
+param_dict["dense.bias"] = mindspore.Parameter(Tensor(param_dict["dense.bias"]
+[:5, ],mindspore.float32), name="dense.bias", requires_grad=True)
+# Carregue os parâmetros de peso modificados no modelo.
+load_param_into_net(network, param_dict)
+train_step_size = dataset_train.get_dataset_size()
+epoch_size = 20
+lr = nn.cosine_decay_lr(min_lr=0.0, max_lr=0.1,total_step=epoch_size *
+train_step_size,step_per_epoch=train_step_size,
+decay_epoch=200)
+# Defina o otimizador.
+network_opt = nn.Momentum(params=network.trainable_params(), learning_rate=0.01,
+momentum=0.9)
+# Defina a função de perda.
+network_loss = loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+# Defina as mé tricas de avaliação.
+metrics = {"Accuracy": nn.Accuracy()}
+# Inicialize o modelo.
+model = Model(network, loss_fn=network_loss, optimizer=network_opt, metrics=metrics)
+# Monitore o valor de perda.
+loss_cb = LossMonitor(per_print_times=train_step_size)
+# Defina o número de passos para salvar o modelo e o número máximo de modelos
+# que podem ser salvos.
+ckpt_config = CheckpointConfig(save_checkpoint_steps=100, keep_checkpoint_max=10)
+# Salve o modelo. Defina o nome, o caminho e os parâmetros para salvar o modelo.
+ckpoint_cb = ModelCheckpoint(prefix="mobilenet_v2", directory=’./ckpt’,
+config=ckpt_config)
+print("============== Starting Training ==============")
+# Treine o modelo, defina o quantidade de iterações de treinamento como 5 e
+# defina o conjunto de treinamento e a função de retorno de chamada.
+model.train(5, dataset_train, callbacks=[loss_cb,ckpoint_cb], dataset_sink_mode=True)
+# Use o conjunto de testes para validar o modelo e gerar a precisão do conjunto
+# de testes.
+metric = model.eval(dataset_val)
+print(metric)
+ES510-Introdução à IA– Prof. David Guerra – 2026 46
+
+Universidade Federal de Pernambuco (UFPE)
+Resultado:
+============== Starting Training ==============
+epoch: 1 step: 201, loss is 0.8389087915420532
+epoch: 2 step: 201, loss is 0.5519619584083557
+epoch: 3 step: 201, loss is 0.26490363478660583
+epoch: 4 step: 201, loss is 0.4540162682533264
+epoch: 5 step: 201, loss is 0.5963617563247681
+{’Accuracy’: 0.9166666666666666}
+Etapa 5– Visualizar os resultados da predição.
+Defina a funçãovisualize_modelpara utilizar o modelo treinado e prever as imagens
+do conjunto de validação.
+Código:
+import matplotlib.pyplot as plt
+import mindspore as ms
+def visualize_model(best_ckpt_path, val_ds):
+num_class = 5# Perform binary classification on wolf and dog images.
+net = mobilenet_v2(num_class)
+# Carregue os parâmetros do modelo.
+param_dict = ms.load_checkpoint(best_ckpt_path)
+ms.load_param_into_net(net, param_dict)
+model = ms.Model(net)
+# Carregue o conjunto de dados de validação.
+data = next(val_ds.create_dict_iterator())
+images = data["image"].asnumpy()
+labels = data["label"].asnumpy()
+class_name = {0:’daisy’,1:’dandelion’,2:’roses’,3:’sunflowers’,4:’tulips’}
+# Preveja o tipo de imagem.
+output = model.predict(ms.Tensor(data[’image’]))
+pred = np.argmax(output.asnumpy(), axis=1)
+# Exiba a imagem e o valor previsto da imagem.
+plt.figure(figsize=(15, 7))
+for i in range(len(labels)):
+plt.subplot(3, 6, i + 1)
+# Se a previsão estiver correta, ela será exibida em azul.
+# Se a previsão estiver incorreta, ela será exibida em vermelho.
+color = ’blue’ if pred[i] == labels[i] else ’red’
+plt.title(’predict:{}’.format(class_name[pred[i]]), color=color)
+picture_show = np.transpose(images[i], (1, 2, 0))
+mean = np.array([0.485, 0.456, 0.406])
+std = np.array([0.229, 0.224, 0.225])
+picture_show = std * picture_show + mean
+picture_show = np.clip(picture_show, 0, 1)
+ES510-Introdução à IA– Prof. David Guerra – 2026 47
+
+Universidade Federal de Pernambuco (UFPE)
+plt.imshow(picture_show)
+plt.axis(’off’)
+plt.show()
+visualize_model(’ckpt/mobilenet_v2-5_201.ckpt’, dataset_val)
+Resultado:
+Figura 7:Resultado das predições do modelo
+4.4 Questão
+Qual API é utilizada para carregar modelos pré-treinados?
+Referências
+1. HUAWEITECHNOLOGIESCO., LTD.ArtificialIntelligenceTechnologyand
+Application: Python Lab Guide. Huawei Technologies Co., Ltd., China.
+2. David Beazley and Guido Van Rossum.Python: Essential Reference.New
+Riders Publishing, USA, 1999.
+ES510-Introdução à IA– Prof. David Guerra – 2026 48
