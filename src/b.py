@@ -207,6 +207,14 @@ mnist_dataset = ds.MnistDataset(DATA_DIR)
 
 resize_op = CV.resize((28, 28))
 rescale_op = CV.resize(1/255, 0)
+hwc2chw_op = CV.HWC2CHW()
+#%%
+
+#%%
+mnist_dataset = mnist_dataset.map(
+    import_columns='label',
+    operations=C.TypeCast
+)
 
 
 
