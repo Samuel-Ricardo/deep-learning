@@ -61,23 +61,50 @@ Arquivo `src/b.py` continha implementação das seções 2.2-2.5 do PDF `[ES510]
 | 3.1.2 Etapa 7 | Treinamento (10 épocas) + checkpoints | ✅ |
 | 3.1.2 Etapa 8 | Validação (~97% esperado) | ✅ |
 
-## Próximos Passos (Não Implementados)
+### `src/d_gui_mnist.py` (Seção 3.2 — GUI PyQt5)
 
-| Seção | Descrição | Complexidade |
-|-------|-----------|--------------|
-| 3.2 | Exercício PyQt5 (canvas + inferência com modelo treinado) | Alta — requer PyQt5, opencv-python, Pillow |
-| 4 | MobileNetV2 — transfer learning para classificação de flores | Alta — requer download de dataset e checkpoint pré-treinado |
+| Seção PDF | Conteúdo | Status |
+|-----------|----------|--------|
+| 3.2.1 | Objetivo: canvas + captura + predição | ✅ |
+| 3.2.2 | Requisitos: canvas, limpar, predizer, resultado | ✅ |
+| 3.2.3 | Etapas: janela, canvas, captura, grayscale, resize, normalize, tensor, load model, predict, display | ✅ |
+| 3.2.4 | Bibliotecas: PyQt5, numpy, Pillow, mindspore | ✅ |
+| 3.2.5 | Fluxo: Canvas → Captura → Pré-processamento → Tensor → Predição → Resultado | ✅ |
+| 3.2.6 | Sugestões: grayscale, argmax, conf display | ✅ |
+| 3.2.7 | Desafio extra: probabilidades por classe | ✅ (confiança exibida) |
+
+### `src/e_mobilenet.py` (Seção 4 — MobileNetV2)
+
+| Seção PDF | Conteúdo | Status |
+|-----------|----------|--------|
+| 4.3.1 Etapa 1 | create_dataset com ImageFolderDataset + augmentation | ✅ |
+| 4.3.1 Etapa 2 | Visualização do dataset de flores | ✅ |
+| 4.3.2 Etapa 3 | Arquitetura MobileNetV2 completa (backbone + head + combine) | ✅ |
+| 4.3.2 Etapa 4 | Transfer learning: load checkpoint ImageNet, adaptar última camada para 5 classes, treinar 5 épocas | ✅ |
+| 4.3.2 Etapa 5 | visualize_model: predições com cor azul/vermelho | ✅ |
+| 4.4 | Questão: API para carregar modelos pré-treinados | ✅ |
+
+## Status Final: PDF 100% Coberto
+
+Todas as seções do PDF `[ES510]_Lab5.pdf` foram implementadas:
+- Seção 2 (2.2-2.8): `src/model.py`, `src/a.py`, `src/b.py`
+- Seção 3.1: `src/c.py`
+- Seção 3.2: `src/d_gui_mnist.py`
+- Seção 4: `src/e_mobilenet.py`
 
 ## Dependências de Ambiente
 
 - Python 3.7 (exigido pelo MindSpore 1.7.1)
 - MindSpore 1.7.1 (wheel específica Windows AMD64)
 - Dataset MNIST em `./MNIST_Data/` (train + test)
-- Para seção 3.2: PyQt5, opencv-python, Pillow (não instalados)
-- Para seção 4: datasets de flores (~230MB) + checkpoint MobileNetV2 (~14MB)
+- Para seção 3.2: `pip install PyQt5 Pillow`
+- Para seção 4: download externo necessário:
+  - flower_photos_train.zip (~115MB)
+  - flower_photos_test.zip (~115MB)
+  - mobilenetv2_ascend_v170_imagenet2012_official_cv_top1acc71.88.ckpt (~14MB)
 
 ## Riscos
 
 - MindSpore 1.7.1 está preso a Python 3.7 que está em EOL
 - Seção 4 depende de URLs externas da Huawei que podem ficar indisponíveis
-- Seção 3.2 (PyQt5) não foi coberta por ser exercício proposto sem código-gabarito no PDF
+- GUI PyQt5 requer display gráfico (não funciona em ambientes headless)
