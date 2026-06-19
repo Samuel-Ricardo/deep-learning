@@ -1,18 +1,5 @@
 #%%
-# ═══════════════════════════════════════════════════════════
-# SEÇÃO 4 - CLASSIFICAÇÃO DE IMAGEM COM MobileNetV2
-# ═══════════════════════════════════════════════════════════
-#
-# Transfer Learning com MobileNetV2 para classificação de flores
-# Dataset: 5 classes (daisy, dandelion, roses, sunflowers, tulips)
-#
-# Pré-requisitos:
-# - Download dos datasets:
-#   https://ascend-professional-construction-dataset.obs.myhuaweicloud.com/deep-learning/flower_photos_train.zip
-#   https://ascend-professional-construction-dataset.obs.myhuaweicloud.com/deep-learning/flower_photos_test.zip
-#
-# - Download do checkpoint pré-treinado (ImageNet):
-#   https://download.mindspore.cn/models/r1.7/mobilenetv2_ascend_v170_imagenet2012_official_cv_top1acc71.88.ckpt
+
 
 import os
 import numpy as np
@@ -31,10 +18,11 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 
 #%%
-# 4.3.1 ETAPA 1 - CARREGAR O CONJUNTO DE DADOS
 
-train_data_path = 'flower_photos_train'
-val_data_path = 'flower_photos_test'
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+train_data_path = os.path.join(PROJECT_ROOT, 'flower_photos_train')
+val_data_path = os.path.join(PROJECT_ROOT, 'flower_photos_test')
 
 
 def create_dataset(data_path, batch_size=18, training=True):
@@ -86,7 +74,7 @@ def create_dataset(data_path, batch_size=18, training=True):
 
 
 #%%
-# Verificar se os datasets existem
+
 
 if not os.path.isdir(train_data_path):
     print(f"AVISO: '{train_data_path}' não encontrado.")
@@ -101,7 +89,7 @@ else:
 
 
 #%%
-# 4.3.1 ETAPA 2 - VISUALIZAR O CONJUNTO DE DADOS
+
 
 import matplotlib.pyplot as plt
 
@@ -135,7 +123,7 @@ if os.path.isdir(train_data_path):
 
 
 #%%
-# 4.3.2 ETAPA 3 - CRIAR O MODELO MobileNetV2
+
 
 def _make_divisible(v, divisor, min_value=None):
     if min_value is None:
@@ -217,7 +205,7 @@ class MobileNetV2Backbone(nn.Cell):
         self.cfgs = inverted_residual_setting
         if inverted_residual_setting is None:
             self.cfgs = [
-                # t, c, n, s
+
                 [1, 16, 1, 1],
                 [6, 24, 2, 2],
                 [6, 32, 3, 2],
@@ -325,9 +313,12 @@ def mobilenet_v2(num_classes):
 
 
 #%%
-# 4.3.2 ETAPA 4 - TREINAR E VALIDAR COM TRANSFER LEARNING
 
-PRETRAINED_CKPT = "./mobilenetv2_ascend_v170_imagenet2012_official_cv_top1acc71.88.ckpt"
+
+PRETRAINED_CKPT = os.path.join(
+    PROJECT_ROOT,
+    "mobilenetv2_ascend_v170_imagenet2012_official_cv_top1acc71.88.ckpt"
+)
 
 if not os.path.isdir(train_data_path):
     print("Datasets de flores não encontrados. Pule esta seção.")
@@ -336,13 +327,13 @@ elif not os.path.isfile(PRETRAINED_CKPT):
     print("Faça download de:")
     print("  https://download.mindspore.cn/models/r1.7/mobilenetv2_ascend_v170_imagenet2012_official_cv_top1acc71.88.ckpt")
 else:
-    # Criar modelo com 5 classes
+
     network = mobilenet_v2(5)
 
-    # Carregar pesos pré-treinados
+
     param_dict = load_checkpoint(PRETRAINED_CKPT)
 
-    # Modificar última camada (1001 classes -> 5 classes)
+
     param_dict["dense.weight"] = ms.Parameter(
         Tensor(param_dict["dense.weight"][:5, :], ms.float32),
         name="dense.weight",
@@ -358,29 +349,29 @@ else:
 
     train_step_size = dataset_train.get_dataset_size()
 
-    # Otimizador
+
     network_opt = nn.Momentum(
         params=network.trainable_params(),
         learning_rate=0.01,
         momentum=0.9
     )
 
-    # Loss
+
     network_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
-    # Métricas
+
     metrics = {"Accuracy": nn.Accuracy()}
 
-    # Model
+
     model = Model(network, loss_fn=network_loss, optimizer=network_opt, metrics=metrics)
 
-    # Callbacks
+
     loss_cb = LossMonitor(per_print_times=train_step_size)
 
     ckpt_config = CheckpointConfig(save_checkpoint_steps=100, keep_checkpoint_max=10)
     ckpoint_cb = ModelCheckpoint(
         prefix="mobilenet_v2",
-        directory='./ckpt_mobilenet',
+        directory=os.path.join(PROJECT_ROOT, 'ckpt_mobilenet'),
         config=ckpt_config
     )
 
@@ -392,14 +383,14 @@ else:
         dataset_sink_mode=True
     )
 
-    # Validação
+
     metric = model.eval(dataset_val)
     print(metric)
 #%%
 
 
 #%%
-# 4.3.2 ETAPA 5 - VISUALIZAR RESULTADOS DA PREDIÇÃO
+
 
 def visualize_model(best_ckpt_path, val_ds):
     """Carrega modelo e exibe predições vs labels reais."""
@@ -437,27 +428,18 @@ def visualize_model(best_ckpt_path, val_ds):
     plt.show()
 
 
-# Executar visualização se checkpoint existir
-ckpt_path = './ckpt_mobilenet/mobilenet_v2-5_201.ckpt'
+ckpt_path = os.path.join(PROJECT_ROOT, 'ckpt_mobilenet', 'mobilenet_v2-5_201.ckpt')
 if os.path.isfile(ckpt_path) and os.path.isdir(val_data_path):
     visualize_model(ckpt_path, dataset_val)
 else:
     print("Checkpoint MobileNetV2 treinado não encontrado. Execute o treino primeiro.")
 #%%
 
+print("Questão Lab 05: load_checkpoint() carrega o checkpoint pré-treinado.")
+print("load_param_into_net() aplica os parâmetros carregados na rede.")
+
 
 #%%
-# 4.4 QUESTÃO
-#
-# Qual API é utilizada para carregar modelos pré-treinados?
-#
-# Resposta: load_checkpoint() e load_param_into_net()
-#
-# - load_checkpoint(ckpt_file) lê o arquivo .ckpt e retorna um dicionário de parâmetros
-# - load_param_into_net(network, param_dict) carrega os parâmetros no modelo de rede
-#
-# Essas APIs permitem:
-# 1. Salvar e restaurar modelos treinados
-# 2. Realizar transfer learning (carregar pesos de outro modelo e adaptar)
-# 3. Continuar treinamento de um checkpoint anterior
+
+
 #%%
