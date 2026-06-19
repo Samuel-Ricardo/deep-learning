@@ -2,5 +2,9 @@ ipykernel
 numpy
 download
 matplotlib
+PyQt5
+Pillow
+--trusted-host pypi.org
+--trusted-host files.pythonhosted.org
 --trusted-host ms-release.obs.cn-north-4.myhuaweicloud.com
 mindspore @ https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.7.1/MindSpore/cpu/x86_64/mindspore-1.7.1-cp37-cp37m-win_amd64.whl ; python_version == "3.7" and platform_system == "Windows" and platform_machine == "AMD64"
