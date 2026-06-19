@@ -1,16 +1,5 @@
 #%%
-# ═══════════════════════════════════════════════════════════
-# SEÇÃO 3.2 - INTERFACE GRÁFICA PARA TESTE DO MODELO MNIST
-# ═══════════════════════════════════════════════════════════
-#
-# Exercício proposto: desenvolver uma aplicação gráfica em Python
-# capaz de permitir ao usuário desenhar dígitos e usar o modelo
-# treinado (Seção 3) para realizar a predição.
-#
-# Fluxo: Canvas → Captura → Pré-processamento → Tensor → Predição → Resultado
-#
-# Dependências extras: PyQt5, numpy, Pillow, mindspore
-# Para instalar: pip install PyQt5 Pillow
+
 
 import sys
 import os
@@ -33,7 +22,7 @@ from PyQt5.QtCore import Qt, QPoint
 
 
 #%%
-# DEFINIÇÃO DA REDE (mesma da Seção 3)
+
 
 class ForwardNN(nn.Cell):
 
@@ -56,7 +45,7 @@ class ForwardNN(nn.Cell):
 
 
 #%%
-# CANVAS DE DESENHO
+
 
 class DrawingCanvas(QWidget):
 
@@ -96,17 +85,17 @@ class DrawingCanvas(QWidget):
 
     def get_image(self):
         """Retorna a imagem do canvas como array numpy 28x28 normalizado."""
-        # Converter QImage para PIL
+
         self.image.save("_temp_digit.png")
         img = Image.open("_temp_digit.png").convert('L')
 
-        # Redimensionar para 28x28
+
         img = img.resize((28, 28), Image.LANCZOS)
 
-        # Converter para array e normalizar
+
         img_array = np.array(img).astype(np.float32) / 255.0
 
-        # Reshape para formato do modelo: (1, 1, 28, 28)
+
         img_array = img_array.reshape(1, 1, 28, 28)
 
         return img_array
@@ -114,7 +103,7 @@ class DrawingCanvas(QWidget):
 
 
 #%%
-# JANELA PRINCIPAL
+
 
 class MNISTApp(QMainWindow):
 
@@ -123,7 +112,7 @@ class MNISTApp(QMainWindow):
         self.setWindowTitle("MNIST Digit Recognition")
         self.setFixedSize(400, 380)
 
-        # Carregar modelo
+
         self.net = ForwardNN()
         if model_path and os.path.isfile(model_path):
             param_dict = load_checkpoint(model_path)
@@ -134,16 +123,16 @@ class MNISTApp(QMainWindow):
 
         self.net.set_train(False)
 
-        # Layout
+
         central = QWidget()
         self.setCentralWidget(central)
         layout = QVBoxLayout(central)
 
-        # Canvas
+
         self.canvas = DrawingCanvas()
         layout.addWidget(self.canvas, alignment=Qt.AlignCenter)
 
-        # Botões
+
         btn_layout = QHBoxLayout()
 
         btn_clear = QPushButton("Limpar")
@@ -156,7 +145,7 @@ class MNISTApp(QMainWindow):
 
         layout.addLayout(btn_layout)
 
-        # Label de resultado
+
         self.result_label = QLabel("Desenhe um dígito e clique em Predizer")
         self.result_label.setAlignment(Qt.AlignCenter)
         self.result_label.setStyleSheet("font-size: 18px; font-weight: bold;")
@@ -170,7 +159,7 @@ class MNISTApp(QMainWindow):
         output = self.net(tensor_input)
         predicted = output.asnumpy().argmax(axis=1)[0]
 
-        # Probabilidades via softmax
+
         exp_out = np.exp(output.asnumpy()[0])
         probs = exp_out / exp_out.sum()
         confidence = probs[predicted] * 100
@@ -179,31 +168,31 @@ class MNISTApp(QMainWindow):
             f"Predição: {predicted}  (Confiança: {confidence:.1f}%)"
         )
 
-        # Limpar arquivo temporário
+
         if os.path.exists("_temp_digit.png"):
             os.remove("_temp_digit.png")
 #%%
 
 
 #%%
-# EXECUÇÃO DA APLICAÇÃO
+
 
 def main():
-    # Buscar checkpoint treinado na Seção 3
+
     ckpt_candidates = [
         './ckpt/checkpoint_net-10_468.ckpt',
         './ckpt/checkpoint_net-10_1875.ckpt',
         '../ckpt/checkpoint_net-10_468.ckpt',
     ]
 
-    # Usar o primeiro checkpoint disponível
+
     model_path = None
     for candidate in ckpt_candidates:
         if os.path.isfile(candidate):
             model_path = candidate
             break
 
-    # Fallback: procurar qualquer .ckpt no diretório ckpt
+
     if model_path is None:
         ckpt_dir = './ckpt'
         if os.path.isdir(ckpt_dir):
