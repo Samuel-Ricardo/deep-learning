@@ -107,8 +107,3 @@ plt.title(data['label'].asnumpy(), fontsize=20)
 plt.show()
 
 
-
-
-
-
-

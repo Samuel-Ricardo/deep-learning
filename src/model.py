@@ -119,7 +119,7 @@ from download import download
 
 url = "https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/" \
 "notebook/datasets/MNIST_Data.zip"
-# note: download will be triggered only if dataset is missing
+
 #%%
 
 #%%
@@ -132,7 +132,7 @@ import matplotlib.pyplot as plt
 
 #%%
 #%%
-# Try common dataset locations and download/extract if missing
+
 preferred_roots = ["./MNIST/train", "./MNIST_Data/train"]
 dataset_dir = None
 for p in preferred_roots:
@@ -148,13 +148,13 @@ if dataset_dir is None:
         print(f"Download failed: {e}")
         path = None
 
-    # prefer extracted folders if present
+
     for p in preferred_roots:
         if os.path.isdir(p):
             dataset_dir = p
             break
 
-    # fallback: look for any directory containing 'mnist' with a train subdir
+
     if dataset_dir is None:
         for d in os.listdir('.'):
             if os.path.isdir(d) and 'mnist' in d.lower():

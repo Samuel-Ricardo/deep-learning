@@ -130,7 +130,6 @@ for m in modelle.parameters_and_names():
 #%%
 
 
-
 #%%
 import numpy as np 
 import mindspore.nn as nn 
@@ -168,7 +167,7 @@ optim = nn.Momentum(
 #%%
 
 #%%
-#mindspore.Model(network, loss_fn, optimizer, metrics)
+
 #%%
 
 #%%
@@ -241,7 +240,7 @@ loss_cb = LossMonitor(per_print_times=1000)
 
 
 #%%
-# 2.5 ETAPA 4 - TREINAR O MODELO
+
 
 model.train(
     epoch=1,
@@ -252,7 +251,7 @@ model.train(
 
 
 #%%
-# 2.5 ETAPA 5 - VALIDAR O MODELO
+
 
 TEST_DIR = next(
     (p for p in ['./MNIST_Data/test', '../MNIST_Data/test', './src/MNIST_Data/test'] if os.path.isdir(p)),
@@ -280,17 +279,14 @@ model.eval(valid_dataset=dataset)
 
 
 #%%
-# ═══════════════════════════════════════════════════════════
-# 2.6 SALVAMENTO E CARREGAMENTO DE MODELOS
-# ═══════════════════════════════════════════════════════════
 
-# Forma 1: salvar o modelo de rede diretamente
+
 ms.save_checkpoint(net, "./MyNet.ckpt")
 #%%
 
 
 #%%
-# Forma 2: salvar durante o treinamento com callbacks
+
 
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 
@@ -316,9 +312,7 @@ model.train(
 
 
 #%%
-# ═══════════════════════════════════════════════════════════
-# 2.7 DIFERENCIAÇÃO AUTOMÁTICA
-# ═══════════════════════════════════════════════════════════
+
 
 import mindspore.ops as ops
 from mindspore import ParameterTuple, Parameter
@@ -327,8 +321,7 @@ from mindspore import dtype as mstype
 
 
 #%%
-# ETAPA 1 - CALCULAR A DERIVADA DA ENTRADA
-# Rede: f(x, y) = z * x * y
+
 
 class Net(nn.Cell):
     def __init__(self):
@@ -377,7 +370,7 @@ print(output)
 
 
 #%%
-# ETAPA 2 - CALCULAR A DERIVADA DOS PESOS (get_by_list=True)
+
 
 class GradNetWrtW(nn.Cell):
     def __init__(self, net):
@@ -396,17 +389,7 @@ print(output)
 
 
 #%%
-# ═══════════════════════════════════════════════════════════
-# 2.8 QUESTÃO
-# ═══════════════════════════════════════════════════════════
-#
-# t1 = Tensor(np.array([[1.2, 2.2],[3.2, 4.2]]), dtype.int32)
-# t2 = Tensor(np.array([[1.2, 2.2],[3.2, 4.2]]), dtype.float32)
-#
-# Sim, t1 pode ser criado. A diferença é:
-# - t1 trunca os valores para inteiro: [[1,2],[3,4]]
-# - t2 mantém os valores reais: [[1.2,2.2],[3.2,4.2]]
-# Isso ocorre porque dtype.int32 descarta a parte decimal durante a conversão.
+
 
 from mindspore import dtype
 
@@ -416,6 +399,5 @@ t2 = Tensor(np.array([[1.2, 2.2],[3.2, 4.2]]), dtype.float32)
 print("t1 (int32):", t1)
 print("t2 (float32):", t2)
 #%%
-
 
 

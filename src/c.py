@@ -1,7 +1,5 @@
 #%%
-# ═══════════════════════════════════════════════════════════
-# SEÇÃO 3 - RECONHECIMENTO DE CARACTERES MNIST (PIPELINE COMPLETO)
-# ═══════════════════════════════════════════════════════════
+
 
 import os
 from matplotlib import pyplot as plt
@@ -31,7 +29,7 @@ context.set_context(
 
 
 #%%
-# 3.1.2 ETAPA 2 - LEITURA DOS DATASETS
+
 
 DATA_DIR_TRAIN = None
 DATA_DIR_TEST = None
@@ -58,7 +56,7 @@ print('Image label style:', image['label'])
 
 
 #%%
-# 3.1.2 ETAPA 3 - PROCESSAMENTO DOS DADOS
+
 
 def create_dataset(training=True, batch_size=128, resize=(28, 28),
                    rescale=1/255, shift=0, buffer_size=64):
@@ -87,7 +85,7 @@ def create_dataset(training=True, batch_size=128, resize=(28, 28),
 
 
 #%%
-# 3.1.2 ETAPA 4 - VISUALIZAR AMOSTRAS
+
 
 vis_ds = create_dataset(training=False)
 data = vis_ds.create_dict_iterator().__next__()
@@ -106,8 +104,7 @@ plt.show()
 
 
 #%%
-# 3.1.2 ETAPA 5 - DEFINIR A REDE NEURAL
-# Rede totalmente conectada: 784 -> 512 -> 128 -> 10
+
 
 class ForwardNN(nn.Cell):
 
@@ -130,7 +127,7 @@ class ForwardNN(nn.Cell):
 
 
 #%%
-# 3.1.2 ETAPA 6 - DEFINIR LOSS E OTIMIZADOR
+
 
 lr = 0.001
 num_epoch = 10
@@ -150,7 +147,7 @@ opt = nn.Adam(net.trainable_params(), lr)
 
 
 #%%
-# 3.1.2 ETAPA 7 - INICIAR TREINAMENTO
+
 
 model = Model(net, loss, opt, metrics)
 
@@ -183,7 +180,7 @@ model.train(
 
 
 #%%
-# 3.1.2 ETAPA 8 - VALIDAR O MODELO
+
 
 metrics_result = model.eval(ds_eval)
 print(metrics_result)
